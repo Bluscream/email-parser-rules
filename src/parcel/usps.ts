@@ -1,31 +1,44 @@
-import { CourierRule } from "../types";
+import { ParcelRule, EmailData, ParserHelpers, ParcelParseResult, RuleMetadata } from "../types";
 
-export const rule: CourierRule = {
+export const rule: ParcelRule = {
   id: "usps",
   name: "USPS",
   domains: ["usps.com"],
-  statusRules: {
-    delivered: {
-      email: [
-        "exact:auto-reply@usps.com"
-      ],
-      subject: [
-        "nocase:delivered"
-      ]
-    },
-    arriving: {
-      email: [
-        "exact:auto-reply@usps.com"
-      ],
-      subject: [
-        "nocase:expected delivery"
-      ]
-    }
+  patterns: {
+    emails: "^auto-reply@usps\\.com$",
+    deliveredSubjects: "Item Delivered",
+    arrivingSubjects: "Expected Delivery on|Out for Delivery",
+    arrivingBodies: "Your item is out for delivery",
+    exceptionSubjects: "Delivery Exception",
+    trackingNumbers: "\\b(?<trackingNumber>9[2345]\\d{15,26})\\b"
   },
-  tracking: {
-    patterns: [
-      "regex:\\b(?<trackingNumber>9[0-9]{20,22})\\b"
-    ]
+  parse(email: EmailData, helpers: ParserHelpers, meta: RuleMetadata): ParcelParseResult | null {
+    if (!helpers.testRegex(email.from, meta.patterns.emails)) return null;
+
+    let status: ParcelParseResult["status"] = "unknown";
+    if (helpers.testRegex(email.subject, meta.patterns.deliveredSubjects)) {
+      status = "delivered";
+    } else if (
+      helpers.testRegex(email.subject, meta.patterns.arrivingSubjects) ||
+      helpers.testRegex(email.bodyPlain, meta.patterns.arrivingBodies)
+    ) {
+      status = "arriving";
+    } else if (helpers.testRegex(email.subject, meta.patterns.exceptionSubjects)) {
+      status = "exception";
+    } else {
+      status = helpers.getParcelStatusFromKeywords(email.subject, email.bodyPlain);
+    }
+
+    const trackingNumbers = helpers.extractAllRegex(
+      `${email.subject}\n${email.bodyPlain}`,
+      meta.patterns.trackingNumbers,
+      "trackingNumber"
+    );
+
+    return {
+      status,
+      trackingNumbers: trackingNumbers.length > 0 ? trackingNumbers : undefined
+    };
   }
 };
 

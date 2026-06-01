@@ -83,7 +83,7 @@ export default rules;
 }
 
 async function main() {
-  const categories = ["parcel", "order", "return"];
+  const categories = ["parcel", "order", "return", "dunning"];
   for (const cat of categories) {
     await buildCategory(cat);
   }

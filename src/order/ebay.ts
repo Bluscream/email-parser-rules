@@ -1,19 +1,34 @@
-import { CourierRule } from "../types";
+import { OrderRule, EmailData, ParserHelpers, OrderParseResult, RuleMetadata } from "../types";
 
-export const rule: CourierRule = {
+export const rule: OrderRule = {
   id: "ebay",
   name: "eBay Order",
-  domains: ["ebay.com", "ebay.ca", "ebay.co.uk", "ebay.de", "ebay.it", "ebay.com.au", "ebay.pl"],
-  statusRules: {
-    ordered: {
-      email: ["regex:^ebay@ebay\\.(com|ca|co\\.uk|de|it|com\\.au|pl)$"],
-      subject: ["nocase:Order confirmed", "nocase:Bestätigung Ihres Kaufs", "nocase:Kupione", "nocase:Your eBay order"]
-    }
+  domains: ["regex:^ebay\\.(com|ca|co\\.uk|de|it|com\\.au|pl)$"],
+  patterns: {
+    emails: "^ebay@ebay\\.(com|ca|co\\.uk|de|it|com\\.au|pl)$",
+    confirmedSubjects: "Order confirmed|Bestätigung Ihres Kaufs|Kupione|Your eBay order",
+    orderNumbers: "\\b(?<orderNumber>\\d{2}-\\d{5}-\\d{5})\\b"
   },
-  tracking: {
-    patterns: [
-      "regex:\\b(?<orderNumber>\\d{2}-\\d{5}-\\d{5})\\b"
-    ]
+  parse(email: EmailData, helpers: ParserHelpers, meta: RuleMetadata): OrderParseResult | null {
+    if (!helpers.testRegex(email.from, meta.patterns.emails)) return null;
+
+    let status: OrderParseResult["status"] = "unknown";
+    if (helpers.testRegex(email.subject, meta.patterns.confirmedSubjects)) {
+      status = "confirmed";
+    } else {
+      status = helpers.getOrderStatusFromKeywords(email.subject, email.bodyPlain);
+    }
+
+    const orderNumbers = helpers.extractAllRegex(
+      `${email.subject}\n${email.bodyPlain}`,
+      meta.patterns.orderNumbers,
+      "orderNumber"
+    );
+
+    return {
+      status,
+      orderNumbers: orderNumbers.length > 0 ? orderNumbers : undefined
+    };
   }
 };
 

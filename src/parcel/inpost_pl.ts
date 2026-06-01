@@ -1,23 +1,37 @@
-import { CourierRule } from "../types";
+import { ParcelRule, EmailData, ParserHelpers, ParcelParseResult, RuleMetadata } from "../types";
 
-export const rule: CourierRule = {
+export const rule: ParcelRule = {
   id: "inpost_pl",
   name: "InPost PL",
-  domains: ["inpost.pl", "paczkomaty.pl"],
-  statusRules: {
-    delivered: {
-      email: ["exact-nocase:powiadomienia@inpost.pl", "exact-nocase:info@paczkomaty.pl", "exact-nocase:powiadomienia@allegromail.pl"],
-      subject: ["nocase:InPost - Potwierdzenie odbioru", "nocase:InPost - Paczka umieszczona w Paczkomacie"]
-    },
-    arriving: {
-      email: ["exact-nocase:powiadomienia@inpost.pl", "exact-nocase:info@paczkomaty.pl", "exact-nocase:powiadomienia@allegromail.pl"],
-      subject: ["nocase:Kurier InPost: Twoja paczka jest w drodze", "nocase:prawie u Ciebie"]
-    }
+  domains: ["inpost.pl", "paczkomaty.pl", "allegromail.pl"],
+  patterns: {
+    emails: "^powiadomienia@inpost\\.pl$|^info@paczkomaty\\.pl$|^powiadomienia@allegromail\\.pl$",
+    deliveredSubjects: "InPost - Potwierdzenie odbioru|InPost - Paczka umieszczona w Paczkomacie",
+    arrivingSubjects: "Kurier InPost: Twoja paczka jest w drodze|prawie u Ciebie",
+    trackingNumbers: "\\b(?<trackingNumber>\\d{24})\\b"
   },
-  tracking: {
-    patterns: [
-      "regex:\\b(?<trackingNumber>\\d{24})\\b"
-    ]
+  parse(email: EmailData, helpers: ParserHelpers, meta: RuleMetadata): ParcelParseResult | null {
+    if (!helpers.testRegex(email.from, meta.patterns.emails)) return null;
+
+    let status: ParcelParseResult["status"] = "unknown";
+    if (helpers.testRegex(email.subject, meta.patterns.deliveredSubjects)) {
+      status = "delivered";
+    } else if (helpers.testRegex(email.subject, meta.patterns.arrivingSubjects)) {
+      status = "arriving";
+    } else {
+      status = helpers.getParcelStatusFromKeywords(email.subject, email.bodyPlain);
+    }
+
+    const trackingNumbers = helpers.extractAllRegex(
+      `${email.subject}\n${email.bodyPlain}`,
+      meta.patterns.trackingNumbers,
+      "trackingNumber"
+    );
+
+    return {
+      status,
+      trackingNumbers: trackingNumbers.length > 0 ? trackingNumbers : undefined
+    };
   }
 };
 

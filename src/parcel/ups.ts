@@ -1,27 +1,40 @@
-import { CourierRule } from "../types";
+import { ParcelRule, EmailData, ParserHelpers, ParcelParseResult, RuleMetadata } from "../types";
 
-export const rule: CourierRule = {
+export const rule: ParcelRule = {
   id: "ups",
   name: "UPS",
   domains: ["ups.com"],
-  statusRules: {
-    delivered: {
-      email: ["exact-nocase:mcinfo@ups.com"],
-      subject: ["nocase:Your UPS Package was delivered", "nocase:Your UPS Packages were delivered"]
-    },
-    arriving: {
-      email: ["exact-nocase:mcinfo@ups.com"],
-      subject: ["nocase:UPS Update: Package Scheduled for Delivery Today", "nocase:UPS Update: Follow Your Delivery on a Live Map", "nocase:UPS Pre-Arrival: Your Driver is Arriving Soon! Follow on a Live Map"]
-    },
-    exception: {
-      email: ["exact-nocase:mcinfo@ups.com"],
-      subject: ["nocase:UPS Update: New Scheduled Delivery Date"]
-    }
+  patterns: {
+    emails: "^mcinfo@ups\\.com$",
+    deliveredSubjects: "Your UPS Package was delivered|Your UPS Packages were delivered",
+    arrivingSubjects: "UPS Update: Package Scheduled for Delivery Today|UPS Update: Follow Your Delivery on a Live Map|UPS Pre-Arrival: Your Driver is Arriving Soon! Follow on a Live Map",
+    exceptionSubjects: "UPS Update: New Scheduled Delivery Date",
+    trackingNumbers: "\\b(?<trackingNumber>1Z?[0-9A-Z]{16})\\b"
   },
-  tracking: {
-    patterns: [
-      "regex:\\b(?<trackingNumber>1Z?[0-9A-Z]{16})\\b"
-    ]
+  parse(email: EmailData, helpers: ParserHelpers, meta: RuleMetadata): ParcelParseResult | null {
+    if (!helpers.testRegex(email.from, meta.patterns.emails)) return null;
+
+    let status: ParcelParseResult["status"] = "unknown";
+    if (helpers.testRegex(email.subject, meta.patterns.deliveredSubjects)) {
+      status = "delivered";
+    } else if (helpers.testRegex(email.subject, meta.patterns.arrivingSubjects)) {
+      status = "arriving";
+    } else if (helpers.testRegex(email.subject, meta.patterns.exceptionSubjects)) {
+      status = "exception";
+    } else {
+      status = helpers.getParcelStatusFromKeywords(email.subject, email.bodyPlain);
+    }
+
+    const trackingNumbers = helpers.extractAllRegex(
+      `${email.subject}\n${email.bodyPlain}`,
+      meta.patterns.trackingNumbers,
+      "trackingNumber"
+    );
+
+    return {
+      status,
+      trackingNumbers: trackingNumbers.length > 0 ? trackingNumbers : undefined
+    };
   }
 };
 

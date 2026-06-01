@@ -1,74 +1,70 @@
-import { CourierRule, EmailData, ParserHelpers, ParsedResult } from "../types";
+import { ParcelRule, EmailData, ParserHelpers, ParcelParseResult, RuleMetadata } from "../types";
 
-const AMAZON_DELIVERED_SUBJECTS = [
-  "Delivered: Your",
-  "Consegna effettuata:",
-  "Dostarczono:",
-  "Geliefert:"
-];
-
-const AMAZON_EXCEPTION_SUBJECT = "Delivery update:";
-const AMAZON_EXCEPTION_BODY_MARKER = "running late";
-
-const AMAZON_TIME_PATTERNS = [
-  "will arrive:",
-  "estimated delivery date is:",
-  "guaranteed delivery date is:",
-  "Arriving:",
-  "Arriverà:",
-  "arriving:",
-  "Dostawa:",
-  "Zustellung:"
-];
-
-export const rule: CourierRule = {
+export const rule: ParcelRule = {
   id: "amazon",
   name: "Amazon",
   domains: ["regex:^amazon\\.(com|ca|co\\.uk|in|de|it|com\\.au|pl)$"],
-  parse(email: EmailData, helpers: ParserHelpers): ParsedResult | null {
+  patterns: {
+    deliveredSubjects: "^Delivered:|^Consegna effettuata:|^Dostarczono:|^Geliefert:",
+    exceptionSubject: "Delivery update:",
+    exceptionBodyMarker: "running late",
+    timePatterns: "will arrive:|estimated delivery date is:|guaranteed delivery date is:|Arriving:|Arriverà:|arriving:|Dostawa:|Zustellung:",
+    lockerSubject: "(You have a package to pick up)(.*)(\\d{6})",
+    lockerBody: "(Your pickup code is <b>)(\\d{6})",
+    otpBody: "(?:one-time password|Einmalpasswort)\\s+(?:is|laute[nt])\\s+(?:<b>)?(\\d{6})",
+    orderRegex: "[0-9]{3}-[0-9]{7}-[0-9]{7}"
+  },
+  parse(email: EmailData, helpers: ParserHelpers, meta: RuleMetadata): ParcelParseResult | null {
     const fromLower = email.from.toLowerCase().trim();
     const subClean = email.subject || "";
     const bodyClean = email.bodyPlain || email.bodyHtml || "";
 
+    // Build domain alternation from meta.domains (e.g. ["amazon.com", "amazon.de", ...])
+    const domainAlt = meta.domains.map(d => d.replace(/\./g, "\\.")).join("|");
     const isAmazon =
       fromLower === "thehub@amazon.com" ||
-      /^(order-update|shipment-tracking|conferma-spedizione|delivering)@amazon\.(com|ca|co\.uk|in|de|it|com\.au|pl)$/i.test(fromLower);
+      new RegExp(`^(order-update|shipment-tracking|conferma-spedizione|delivering)@(${domainAlt})$`, "i").test(fromLower);
 
     if (!isAmazon) return null;
 
     // Determine Package Status
-    let status: ParsedResult["status"] = "arriving";
-    if (AMAZON_DELIVERED_SUBJECTS.some((s) => subClean.includes(s))) {
+    let status: ParcelParseResult["status"] = "arriving";
+    if (helpers.testRegex(subClean, meta.patterns.deliveredSubjects)) {
       status = "delivered";
     } else if (
-      subClean.includes(AMAZON_EXCEPTION_SUBJECT) &&
-      bodyClean.includes(AMAZON_EXCEPTION_BODY_MARKER)
+      helpers.testRegex(subClean, meta.patterns.exceptionSubject) &&
+      helpers.testRegex(bodyClean, meta.patterns.exceptionBodyMarker)
     ) {
       status = "exception";
     }
 
-    // Extract Hub Code
-    let hubCode: string | undefined = undefined;
-    const subjectRegex = /(You have a package to pick up)(.*)(\d{6})/i;
-    const bodyRegex = /(Your pickup code is <b>)(\d{6})/i;
+    // Extract Secret Code / OTP
+    let secretCode: string | undefined = undefined;
+    let secretType: ParcelParseResult["secretType"] = undefined;
 
-    const subjectMatch = subjectRegex.exec(subClean);
-    if (subjectMatch?.[3]) {
-      hubCode = subjectMatch[3];
+    const lockerSubjectMatch = helpers.extractRegex(subClean, meta.patterns.lockerSubject, 3);
+    if (lockerSubjectMatch) {
+      secretCode = lockerSubjectMatch;
+      secretType = "locker";
     } else {
-      const bodyMatch = bodyRegex.exec(bodyClean);
-      if (bodyMatch?.[2]) {
-        hubCode = bodyMatch[2];
+      const lockerBodyMatch = helpers.extractRegex(bodyClean, meta.patterns.lockerBody, 2);
+      if (lockerBodyMatch) {
+        secretCode = lockerBodyMatch;
+        secretType = "locker";
+      } else {
+        const otpBodyMatch = helpers.extractRegex(bodyClean, meta.patterns.otpBody, 1);
+        if (otpBodyMatch) {
+          secretCode = otpBodyMatch;
+          secretType = "courier";
+        }
       }
     }
 
     // Extract Order Numbers
     const orderNumbers: string[] = [];
-    const orderRegex = /[0-9]{3}-[0-9]{7}-[0-9]{7}/g;
     const text = `${subClean}\n${bodyClean}`;
-    const matches = text.matchAll(orderRegex);
-    for (const match of matches) {
-      const order = match[0];
+    const matches = helpers.extractAllRegex(text, meta.patterns.orderRegex);
+    for (const order of matches) {
       if (!orderNumbers.includes(order)) {
         orderNumbers.push(order);
       }
@@ -76,7 +72,8 @@ export const rule: CourierRule = {
 
     // Extract Delivery Date
     let deliveryDate: Date | undefined = undefined;
-    for (const search of AMAZON_TIME_PATTERNS) {
+    const timePatterns = meta.patterns.timePatterns.split("|");
+    for (const search of timePatterns) {
       const idx = bodyClean.indexOf(search);
       if (idx === -1) continue;
 
@@ -147,13 +144,36 @@ export const rule: CourierRule = {
       }
     }
 
+    let trackingUrl = helpers.extractRegex(
+      email.bodyPlain,
+      "https?:\\/\\/(?:www\\.)?amazon\\.[a-z.]+\\/(?:gp\\/r\\.html|gp\\/css|gp\\/web-to-order|progress-tracker\\/package)[^\\s\"'<]+"
+    );
+    if (trackingUrl) {
+      trackingUrl = trackingUrl.replace(/=\r?\n/g, "").replace(/=3D/g, "=").replace(/[.,;:!]+$/, "");
+    }
+
+    const shipmentId = helpers.extractRegex(
+      email.bodyPlain,
+      "\\bshipmentId(?:=3D|=)([A-Za-z0-9]+)\\b",
+      1
+    );
+
+    const trackingNumbers: string[] = [];
+    if (shipmentId) {
+      trackingNumbers.push(shipmentId);
+    }
+
+    const deliveryWindow = helpers.parseDeliveryWindow(email.bodyPlain);
+
     return {
-      courier: "amazon",
-      trackingNumbers: orderNumbers,
       status,
+      trackingNumbers: trackingNumbers.length > 0 ? trackingNumbers : undefined,
       orderNumbers,
-      amazonHubCode: hubCode,
-      deliveryDate
+      secretCode,
+      secretType,
+      deliveryDate,
+      trackingUrl,
+      deliveryWindow
     };
   }
 };
