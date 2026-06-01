@@ -24,32 +24,15 @@ const AMAZON_TIME_PATTERNS = [
 export const rule: CourierRule = {
   id: "amazon",
   name: "Amazon",
-  domains: ["amazon.com", "amazon.ca", "amazon.co.uk", "amazon.in", "amazon.de", "amazon.it", "amazon.com.au", "amazon.pl"],
+  domains: ["regex:^amazon\\.(com|ca|co\\.uk|in|de|it|com\\.au|pl)$"],
   parse(email: EmailData, helpers: ParserHelpers): ParsedResult | null {
     const fromLower = email.from.toLowerCase().trim();
     const subClean = email.subject || "";
     const bodyClean = email.bodyPlain || email.bodyHtml || "";
 
-    const domains = [
-      "amazon.com", "amazon.ca", "amazon.co.uk", "amazon.in", 
-      "amazon.de", "amazon.it", "amazon.com.au", "amazon.pl"
-    ];
-
     const isAmazon =
-      fromLower.includes("thehub@amazon.com") ||
-      domains.some((domain) => {
-        if (fromLower.endsWith(`@${domain}`)) return true;
-        const atIdx = fromLower.indexOf("@");
-        if (atIdx !== -1) {
-          const prefix = fromLower.substring(0, atIdx);
-          const domainPart = fromLower.substring(atIdx + 1);
-          return (
-            domainPart === domain &&
-            ["order-update", "shipment-tracking", "conferma-spedizione", "delivering"].includes(prefix)
-          );
-        }
-        return false;
-      });
+      fromLower === "thehub@amazon.com" ||
+      /^(order-update|shipment-tracking|conferma-spedizione|delivering)@amazon\.(com|ca|co\.uk|in|de|it|com\.au|pl)$/i.test(fromLower);
 
     if (!isAmazon) return null;
 
