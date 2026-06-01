@@ -1,0 +1,4 @@
+{
+  "email": ["exact:auto-reply@usps.com"],
+  "subject": ["Item Delivered"]
+}

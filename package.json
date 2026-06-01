@@ -1,0 +1,14 @@
+{
+  "name": "email-parser-rules",
+  "version": "1.0.0",
+  "description": "Modular email parsing rules compiled and minified.",
+  "main": "dist/parcel.js",
+  "scripts": {
+    "build": "tsx build.ts"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.1",
+    "tsx": "^4.7.1",
+    "typescript": "^5.4.2"
+  }
+}

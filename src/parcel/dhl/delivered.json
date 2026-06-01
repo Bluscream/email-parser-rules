@@ -1,0 +1,10 @@
+{
+  "email": [
+    "exact:donotreply_odd@dhl.com",
+    "exact:NoReply.ODD@dhl.com",
+    "exact:noreply@dhl.de",
+    "exact:pl.no.reply@dhl.com"
+  ],
+  "subject": ["nocase:DHL On Demand Delivery", "nocase:Powiadomienie o przesyłce"],
+  "body": ["has been delivered", "została doręczona"]
+}
