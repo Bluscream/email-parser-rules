@@ -1,8 +1,0 @@
-{
-  "email": [
-    "exact:noreply@gls-group.eu",
-    "exact:powiadomienia@allegromail.pl"
-  ],
-  "subject": ["paczka w drodze"],
-  "body": ["Zespół GLS"]
-}

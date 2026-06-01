@@ -1,5 +1,0 @@
-{
-  "email": ["exact:auto-reply@usps.com"],
-  "subject": ["Expected Delivery on", "Out for Delivery"],
-  "body": ["Your item is out for delivery"]
-}

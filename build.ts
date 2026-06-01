@@ -20,85 +20,25 @@ async function buildCategory(category: string) {
   console.log(`[Builder] Compiling ruleset category: ${category}`);
 
   const items = await fs.readdir(categoryDir, { withFileTypes: true });
-  const courierDirs = items.filter(item => item.isDirectory()).map(item => item.name);
+  const tsFiles = items
+    .filter(item => item.isFile() && item.name.endsWith(".ts") && !item.name.startsWith("_"))
+    .map(item => item.name);
 
   const importStatements: string[] = [];
-  const ruleDeclarations: string[] = [];
+  const ruleNames: string[] = [];
 
-  for (const courier of courierDirs) {
-    const courierDir = path.join(categoryDir, courier);
+  for (const filename of tsFiles) {
+    const ruleName = path.basename(filename, ".ts");
+    const importName = `${ruleName}_rule`;
+    
+    // Import the default export from the TS file
+    importStatements.push(`import ${importName} from "./${category}/${ruleName}";`);
+    ruleNames.push(importName);
+  }
 
-    // Read JSON metadata and rules
-    const metadataPath = path.join(courierDir, "_.json");
-    if (!(await exists(metadataPath))) {
-      console.warn(`[Builder] Skip: missing metadata _.json in ${courierDir}`);
-      continue;
-    }
-
-    const metadata = JSON.parse(await fs.readFile(metadataPath, "utf-8"));
-    const domains = metadata.domains || [];
-    const name = metadata.name || courier;
-
-    // Load static rules
-    const statusRules: Record<string, any> = {};
-
-    const deliveredPath = path.join(courierDir, "delivered.json");
-    if (await exists(deliveredPath)) {
-      statusRules.delivered = JSON.parse(await fs.readFile(deliveredPath, "utf-8"));
-    }
-
-    const deliveringPath = path.join(courierDir, "delivering.json");
-    if (await exists(deliveringPath)) {
-      statusRules.arriving = JSON.parse(await fs.readFile(deliveringPath, "utf-8"));
-    }
-
-    const exceptionPath = path.join(courierDir, "exception.json");
-    if (await exists(exceptionPath)) {
-      statusRules.exception = JSON.parse(await fs.readFile(exceptionPath, "utf-8"));
-    }
-
-    const orderedPath = path.join(courierDir, "ordered.json");
-    if (await exists(orderedPath)) {
-      statusRules.ordered = JSON.parse(await fs.readFile(orderedPath, "utf-8"));
-    }
-
-    const sentPath = path.join(courierDir, "sent.json");
-    if (await exists(sentPath)) {
-      statusRules.sent = JSON.parse(await fs.readFile(sentPath, "utf-8"));
-    }
-
-    const trackingPath = path.join(courierDir, "tracking.json");
-    let tracking: any = undefined;
-    if (await exists(trackingPath)) {
-      tracking = JSON.parse(await fs.readFile(trackingPath, "utf-8"));
-    }
-
-    // Check for custom parser file
-    const parserPath = path.join(courierDir, "parser.ts");
-    const hasParser = await exists(parserPath);
-
-    const ruleObjStr = JSON.stringify({
-      id: courier,
-      name,
-      domains,
-      statusRules: Object.keys(statusRules).length > 0 ? statusRules : undefined,
-      tracking
-    }, null, 2);
-
-    if (hasParser) {
-      // Import the custom parser function
-      const importName = `${courier}_parser`;
-      importStatements.push(`import { parse as ${importName} } from "./${category}/${courier}/parser";`);
-
-      // Inject parse callback into the exported rule object
-      const objectWithParser = ruleObjStr.replace(
-        /\n}$/,
-        `,\n  parse: ${importName}\n}`
-      );
-      ruleDeclarations.push(objectWithParser);
-    } else {
-      ruleDeclarations.push(ruleObjStr);
-    }
+  if (ruleNames.length === 0) {
+    console.log(`[Builder] Category '${category}' has no rules. Skipping.`);
+    return;
   }
 
   // Create temporary entry point TS file
@@ -107,7 +47,7 @@ async function buildCategory(category: string) {
 ${importStatements.join("\n")}
 
 export const rules = [
-  ${ruleDeclarations.join(",\n  ")}
+  ${ruleNames.join(",\n  ")}
 ];
 
 export default rules;
