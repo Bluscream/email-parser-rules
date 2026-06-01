@@ -11,7 +11,7 @@ export const rule: OrderRule = {
     confirmedSubjects: "Your order|Bestätigung|Potwierdzenie zamówienia|Ihre Bestellung|Order Confirmation",
     shippedEmails: "^(shipment-tracking|versandbestaetigung|dispatch-confirmation)@amazon\\.(com|ca|co\\.uk|in|de|it|com\\.au|pl)$",
     shippedSubjects: "Your Amazon.com order has shipped|versandt|dispatched|spedita|enviado",
-    ignoredEmails: "^(no-reply|rueckgabe|order-update|shipment-tracking|conferma-spedizione|delivering)@amazon\\.(com|ca|co\\.uk|in|de|it|com\\.au|pl)$",
+    ignoredEmails: "^(no-reply|rueckgabe|order-update|conferma-spedizione|delivering)@amazon\\.(com|ca|co\\.uk|in|de|it|com\\.au|pl)$",
     ignoredSubjects: "Zahlungsbestätigung|Payment confirmation|Conferma di pagamento",
     orderNumbers: "\\b(?<orderNumber>[0-9]{3}-[0-9]{7}-[0-9]{7})\\b",
     ignoredFromPrefixes: "^(mp-lastschriftservice-ape|lastschriftservice|cs-reply)@",
