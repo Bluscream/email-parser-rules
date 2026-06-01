@@ -3,6 +3,8 @@ import { ParcelRule, EmailData, ParserHelpers, ParcelParseResult, RuleMetadata }
 export const rule: ParcelRule = {
   id: "royal",
   name: "Royal Mail",
+  description: "Parses Royal Mail postage confirmations, delivery statuses, and collection updates.",
+  icon_url: "https://www.google.com/s2/favicons?domain=royalmail.com&sz=128",
   domains: ["royalmail.com"],
   patterns: {
     emails: "^no-reply@royalmail\\.com$",

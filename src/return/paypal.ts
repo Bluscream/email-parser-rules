@@ -3,6 +3,8 @@ import { ReturnRule, EmailData, ParserHelpers, ReturnParseResult, RuleMetadata }
 export const rule: ReturnRule = {
   id: "paypal",
   name: "PayPal Refund",
+  description: "Parses PayPal refund confirmations and money receipt notifications.",
+  icon_url: "https://www.google.com/s2/favicons?domain=paypal.com&sz=128",
   domains: ["regex:^paypal\\.(com|co\\.uk|de|pl|it)$"],
   patterns: {
     emails: "^service@paypal\\.(com|co\\.uk|de|pl|it)$",

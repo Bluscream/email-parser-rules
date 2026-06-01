@@ -3,6 +3,8 @@ import { ParcelRule, EmailData, ParserHelpers, ParcelParseResult, RuleMetadata }
 export const rule: ParcelRule = {
   id: "fedex",
   name: "FedEx",
+  description: "Parses FedEx shipment updates, delivery statuses, and scheduling alerts.",
+  icon_url: "https://www.google.com/s2/favicons?domain=fedex.com&sz=128",
   domains: ["fedex.com"],
   patterns: {
     emails: "^TrackingUpdates@fedex\\.com$|^fedexcanada@fedex\\.com$",

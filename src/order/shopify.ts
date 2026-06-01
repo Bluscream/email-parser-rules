@@ -3,6 +3,8 @@ import { OrderRule, EmailData, ParserHelpers, OrderParseResult, RuleMetadata } f
 export const rule: OrderRule = {
   id: "shopify",
   name: "Shopify Order",
+  description: "Parses shop-specific order confirmations, shipping updates, and receipts driven by Shopify.",
+  icon_url: "https://www.google.com/s2/favicons?domain=shopify.com&sz=128",
   domains: ["shopify.com", "shopifyemail.com"],
   patterns: {
     confirmedSubjects: "Order confirmed|Thank you for your order|Potwierdzenie zamówienia",

@@ -3,6 +3,8 @@ import { ParcelRule, EmailData, ParserHelpers, ParcelParseResult, RuleMetadata }
 export const rule: ParcelRule = {
   id: "auspost",
   name: "Australia Post",
+  description: "Parses Australia Post shipment updates, tracking statuses, and arrival notifications.",
+  icon_url: "https://www.google.com/s2/favicons?domain=auspost.com.au&sz=128",
   domains: ["auspost.com.au", "notifications.auspost.com.au"],
   patterns: {
     emails: "^noreply@notifications\\.auspost\\.com\\.au$",

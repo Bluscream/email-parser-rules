@@ -3,6 +3,8 @@ import { ParcelRule, EmailData, ParserHelpers, ParcelParseResult, RuleMetadata }
 export const rule: ParcelRule = {
   id: "inpost_pl",
   name: "InPost PL",
+  description: "Parses InPost Paczkomaty locker collection codes and delivery updates.",
+  icon_url: "https://www.google.com/s2/favicons?domain=inpost.pl&sz=128",
   domains: ["inpost.pl", "paczkomaty.pl", "allegromail.pl"],
   patterns: {
     emails: "^powiadomienia@inpost\\.pl$|^info@paczkomaty\\.pl$|^powiadomienia@allegromail\\.pl$",

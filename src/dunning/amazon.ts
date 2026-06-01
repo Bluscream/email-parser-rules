@@ -3,6 +3,8 @@ import { DunningRule, EmailData, ParserHelpers, DunningParseResult, RuleMetadata
 export const rule: DunningRule = {
   id: "amazon",
   name: "Amazon Dunning",
+  description: "Parses Amazon order confirmations, shipping updates, returns, and locker pickup codes.",
+  icon_url: "https://www.google.com/s2/favicons?domain=amazon.com&sz=128",
   domains: ["regex:^amazon\\.(com|ca|co\\.uk|in|de|it|com\\.au|pl)$"],
   patterns: {
     dunningEmails: "^mp-lastschriftservice-ape@amazon\\.(com|ca|co\\.uk|in|de|it|com\\.au|pl)$|^lastschriftservice@amazon\\.(com|ca|co\\.uk|in|de|it|com\\.au|pl)$",

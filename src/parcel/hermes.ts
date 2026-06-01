@@ -3,6 +3,8 @@ import { ParcelRule, EmailData, ParserHelpers, ParcelParseResult, RuleMetadata }
 export const rule: ParcelRule = {
   id: "hermes",
   name: "Hermes",
+  description: "Parses Evri / Hermes parcel tracking updates and delivery notifications.",
+  icon_url: "https://www.google.com/s2/favicons?domain=evri.com&sz=128",
   domains: ["myhermes.co.uk"],
   patterns: {
     emails: "^donotreply@myhermes\\.co\\.uk$",

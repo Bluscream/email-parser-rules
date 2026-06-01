@@ -3,6 +3,8 @@ import { ParcelRule, EmailData, ParserHelpers, ParcelParseResult, RuleMetadata }
 export const rule: ParcelRule = {
   id: "gls",
   name: "GLS",
+  description: "Parses GLS parcel shipment details and delivery notifications.",
+  icon_url: "https://www.google.com/s2/favicons?domain=gls-group.eu&sz=128",
   domains: ["gls-group.eu", "allegromail.pl"],
   patterns: {
     emails: "^noreply@gls-group\\.eu$|^powiadomienia@allegromail\\.pl$",

@@ -31,10 +31,11 @@ export interface ParserHelpers {
   monthsMap: Record<string, number>;
 }
 
-/** Base metadata for any rule — also passed to custom parse() callbacks */
 export interface RuleMetadata {
   id: string;
   name: string;
+  description: string;
+  icon_url: string;
   /** Domain list — may contain regex: prefixed patterns */
   domains: string[];
   /** Object of regex patterns defined by each rule */
@@ -51,6 +52,8 @@ export type ParcelStatus =
   | "exception"
   | "unknown";
 
+export type SecretType = "locker" | "courier" | "pickup";
+
 export interface ParcelParseResult {
   status: ParcelStatus;
   /** Carrier-assigned tracking numbers */
@@ -64,7 +67,7 @@ export interface ParcelParseResult {
   /** One-time password or pickup code */
   secretCode?: string;
   /** The type of the secret code (e.g. locker, courier, pickup) */
-  secretType?: "locker" | "courier" | "pickup" | string;
+  secretType?: SecretType;
   /** Actual carrier when shipped via a third party (e.g. UPS via Amazon) */
   carrier?: string;
   /** Depot, locker, or location string from the email */

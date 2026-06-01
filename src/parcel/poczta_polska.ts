@@ -3,6 +3,8 @@ import { ParcelRule, EmailData, ParserHelpers, ParcelParseResult, RuleMetadata }
 export const rule: ParcelRule = {
   id: "poczta_polska",
   name: "Poczta Polska",
+  description: "Parses Poczta Polska registered mail updates and delivery notifications.",
+  icon_url: "https://www.google.com/s2/favicons?domain=poczta-polska.pl&sz=128",
   domains: ["poczta-polska.pl", "allegromail.pl"],
   patterns: {
     emails: "^informacja@poczta-polska\\.pl$|^powiadomienia@allegromail\\.pl$",

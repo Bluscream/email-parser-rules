@@ -3,6 +3,8 @@ import { ParcelRule, EmailData, ParserHelpers, ParcelParseResult, RuleMetadata }
 export const rule: ParcelRule = {
   id: "dhl",
   name: "DHL",
+  description: "Parses DHL delivery updates, scheduled arrivals, and delivery confirmations.",
+  icon_url: "https://www.google.com/s2/favicons?domain=dhl.com&sz=128",
   domains: ["dhl.com", "dhl.de"],
   patterns: {
     emails: "^donotreply_odd@dhl\\.com$|^NoReply\\.ODD@dhl\\.com$|^noreply@dhl\\.de$|^pl\\.no\\.reply@dhl\\.com$",
@@ -10,7 +12,9 @@ export const rule: ParcelRule = {
     deliveredBodies: "has been delivered|została doręczona|zugestellt",
     arrivingSubjects: "DHL On Demand Delivery|paket kommt heute|Powiadomienie o przesyłce",
     arrivingBodies: "scheduled for delivery TODAY|zostanie dziś do Państwa doręczona",
-    trackingNumbers: "\\b(?<trackingNumber>\\d{10,11})\\b"
+    trackingNumbers: "\\b(?<trackingNumber>\\d{10,11})\\b",
+    trackingUrl: "https?:\\/\\/(?:www\\.)?dhl\\.(?:de|com)\\/[^\\s\"'<]+",
+    weight: "\\b(?<weight>\\d+(?:[.,]\\d+)?)\\s*(?:kg|g|kilogram)\\b"
   },
   parse(email: EmailData, helpers: ParserHelpers, meta: RuleMetadata): ParcelParseResult | null {
     if (!helpers.testRegex(email.from, meta.patterns.emails)) return null;
@@ -38,7 +42,7 @@ export const rule: ParcelRule = {
 
     let trackingUrl = helpers.extractRegex(
       email.bodyPlain,
-      "https?:\\/\\/(?:www\\.)?dhl\\.(?:de|com)\\/[^\\s\"'<]+"
+      meta.patterns.trackingUrl
     );
     if (trackingUrl) {
       trackingUrl = trackingUrl.replace(/[.,;:!]+$/, "");
@@ -48,7 +52,7 @@ export const rule: ParcelRule = {
 
     const weight = helpers.extractRegex(
       email.bodyPlain,
-      "\\b(?<weight>\\d+(?:[.,]\\d+)?)\\s*(?:kg|g|kilogram)\\b",
+      meta.patterns.weight,
       "weight"
     );
 

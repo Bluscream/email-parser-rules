@@ -3,6 +3,8 @@ import { OrderRule, EmailData, ParserHelpers, OrderParseResult, RuleMetadata } f
 export const rule: OrderRule = {
   id: "ebay",
   name: "eBay Order",
+  description: "Parses eBay purchase confirmations, order updates, and seller messages.",
+  icon_url: "https://www.google.com/s2/favicons?domain=ebay.com&sz=128",
   domains: ["regex:^ebay\\.(com|ca|co\\.uk|de|it|com\\.au|pl)$"],
   patterns: {
     emails: "^ebay@ebay\\.(com|ca|co\\.uk|de|it|com\\.au|pl)$",

@@ -3,6 +3,8 @@ import { ParcelRule, EmailData, ParserHelpers, ParcelParseResult, RuleMetadata }
 export const rule: ParcelRule = {
   id: "dpd_com_pl",
   name: "DPD PL",
+  description: "Parses DPD delivery tracking, scheduling updates, and receipt confirmations.",
+  icon_url: "https://www.google.com/s2/favicons?domain=dpd.com&sz=128",
   domains: ["dpd.com.pl", "allegromail.pl"],
   patterns: {
     emails: "KurierDPD\\d+@dpd\\.com\\.pl|^powiadomienia@allegromail\\.pl$",

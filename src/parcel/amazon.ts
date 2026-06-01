@@ -3,6 +3,8 @@ import { ParcelRule, EmailData, ParserHelpers, ParcelParseResult, RuleMetadata }
 export const rule: ParcelRule = {
   id: "amazon",
   name: "Amazon",
+  description: "Parses Amazon order confirmations, shipping updates, returns, and locker pickup codes.",
+  icon_url: "https://www.google.com/s2/favicons?domain=amazon.com&sz=128",
   domains: ["regex:^amazon\\.(com|ca|co\\.uk|in|de|it|com\\.au|pl)$"],
   patterns: {
     deliveredSubjects: "^Delivered:|^Consegna effettuata:|^Dostarczono:|^Geliefert:",
@@ -12,18 +14,23 @@ export const rule: ParcelRule = {
     lockerSubject: "(You have a package to pick up)(.*)(\\d{6})",
     lockerBody: "(Your pickup code is <b>)(\\d{6})",
     otpBody: "(?:one-time password|Einmalpasswort)\\s+(?:is|laute[nt])\\s+(?:<b>)?(\\d{6})",
-    orderRegex: "[0-9]{3}-[0-9]{7}-[0-9]{7}"
+    orderRegex: "[0-9]{3}-[0-9]{7}-[0-9]{7}",
+    senderEmails: "^(order-update|shipment-tracking|conferma-spedizione|delivering)@amazon\\.(com|ca|co\\.uk|in|de|it|com\\.au|pl)$",
+    hubEmail: "^thehub@amazon\\.com$",
+    endKeywords: "Previously expected:|Track your|Per tracciare il tuo pacco|View or manage order|<|\\n|\\r",
+    trackingUrl: "https?:\\/\\/(?:www\\.)?amazon\\.[a-z.]+\\/(?:gp\\/r\\.html|gp\\/css|gp\\/web-to-order|progress-tracker\\/package)[^\\s\"'<]+",
+    shipmentId: "\\bshipmentId(?:=3D|=)([A-Za-z0-9]+)\\b",
+    todayWords: "today|oggi|dzisiaj|heute",
+    tomorrowWords: "tomorrow|domani|jutro|morgen"
   },
   parse(email: EmailData, helpers: ParserHelpers, meta: RuleMetadata): ParcelParseResult | null {
     const fromLower = email.from.toLowerCase().trim();
     const subClean = email.subject || "";
     const bodyClean = email.bodyPlain || email.bodyHtml || "";
 
-    // Build domain alternation from meta.domains (e.g. ["amazon.com", "amazon.de", ...])
-    const domainAlt = meta.domains.map(d => d.replace(/\./g, "\\.")).join("|");
     const isAmazon =
-      fromLower === "thehub@amazon.com" ||
-      new RegExp(`^(order-update|shipment-tracking|conferma-spedizione|delivering)@(${domainAlt})$`, "i").test(fromLower);
+      helpers.testRegex(fromLower, meta.patterns.hubEmail) ||
+      helpers.testRegex(fromLower, meta.patterns.senderEmails);
 
     if (!isAmazon) return null;
 
@@ -79,10 +86,7 @@ export const rule: ParcelRule = {
 
       const start = idx + search.length;
       let end = bodyClean.length;
-      const endKeywords = [
-        "Previously expected:", "Track your", "Per tracciare il tuo pacco",
-        "View or manage order", "<", "\n", "\r"
-      ];
+      const endKeywords = meta.patterns.endKeywords.split("|");
 
       for (const kw of endKeywords) {
         const kwIdx = bodyClean.indexOf(kw, start);
@@ -95,8 +99,8 @@ export const rule: ParcelRule = {
       if (!arriveDateStr) continue;
 
       const lowerDateStr = arriveDateStr.toLowerCase();
-      const todayWords = ["today", "oggi", "dzisiaj", "heute"];
-      const tomorrowWords = ["tomorrow", "domani", "jutro", "morgen"];
+      const todayWords = meta.patterns.todayWords.split("|");
+      const tomorrowWords = meta.patterns.tomorrowWords.split("|");
 
       if (todayWords.some((w) => lowerDateStr.includes(w))) {
         deliveryDate = new Date();
@@ -146,7 +150,7 @@ export const rule: ParcelRule = {
 
     let trackingUrl = helpers.extractRegex(
       email.bodyPlain,
-      "https?:\\/\\/(?:www\\.)?amazon\\.[a-z.]+\\/(?:gp\\/r\\.html|gp\\/css|gp\\/web-to-order|progress-tracker\\/package)[^\\s\"'<]+"
+      meta.patterns.trackingUrl
     );
     if (trackingUrl) {
       trackingUrl = trackingUrl.replace(/=\r?\n/g, "").replace(/=3D/g, "=").replace(/[.,;:!]+$/, "");
@@ -154,7 +158,7 @@ export const rule: ParcelRule = {
 
     const shipmentId = helpers.extractRegex(
       email.bodyPlain,
-      "\\bshipmentId(?:=3D|=)([A-Za-z0-9]+)\\b",
+      meta.patterns.shipmentId,
       1
     );
 
