@@ -17,9 +17,9 @@ By separating the parsing rules from your core application, you can update, expa
 
 ## 📖 Table of Contents
 
-*   [**Creating Rules**](creating-rules.md)
+*   [**Creating Rules**](docs/creating-rules.md)
     *   Learn how to configure metadata (`_.json`), build status matching, use high-performance prefix search, extract variables declaratively using Regex Named Capture Groups, and write custom JavaScript parser callbacks.
-*   [**Application Integration Guide**](app-integration.md)
+*   [**Application Integration Guide**](docs/app-integration.md)
     *   Learn how to fetch, safely execute, cache, and fall back on compiled JS rulesets inside your own application engine.
 
 ---
