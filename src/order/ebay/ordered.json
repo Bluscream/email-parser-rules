@@ -1,0 +1,17 @@
+{
+  "email": [
+    "exact-nocase:ebay@ebay.com",
+    "exact-nocase:ebay@ebay.ca",
+    "exact-nocase:ebay@ebay.co.uk",
+    "exact-nocase:ebay@ebay.de",
+    "exact-nocase:ebay@ebay.it",
+    "exact-nocase:ebay@ebay.com.au",
+    "exact-nocase:ebay@ebay.pl"
+  ],
+  "subject": [
+    "nocase:Order confirmed",
+    "nocase:Bestätigung Ihres Kaufs",
+    "nocase:Kupione",
+    "nocase:Your eBay order"
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "patterns": [
+    "regex:\\b(?<orderNumber>\\d{2}-\\d{5}-\\d{5})\\b"
+  ]
+}

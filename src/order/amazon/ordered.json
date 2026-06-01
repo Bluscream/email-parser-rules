@@ -1,0 +1,18 @@
+{
+  "email": [
+    "exact-nocase:auto-confirm@amazon.com",
+    "exact-nocase:auto-confirm@amazon.ca",
+    "exact-nocase:auto-confirm@amazon.co.uk",
+    "exact-nocase:auto-confirm@amazon.in",
+    "exact-nocase:auto-confirm@amazon.de",
+    "exact-nocase:auto-confirm@amazon.it",
+    "exact-nocase:auto-confirm@amazon.com.au",
+    "exact-nocase:auto-confirm@amazon.pl"
+  ],
+  "subject": [
+    "nocase:Your order",
+    "nocase:Bestätigung Ihrer Bestellung",
+    "nocase:Potwierdzenie zamówienia",
+    "nocase:Ihre Bestellung"
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "patterns": [
+    "regex:order\\s+#(?<orderNumber>\\d+)\\b"
+  ]
+}

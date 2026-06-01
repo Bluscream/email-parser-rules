@@ -57,6 +57,16 @@ async function buildCategory(category: string) {
       statusRules.exception = JSON.parse(await fs.readFile(exceptionPath, "utf-8"));
     }
 
+    const orderedPath = path.join(courierDir, "ordered.json");
+    if (await exists(orderedPath)) {
+      statusRules.ordered = JSON.parse(await fs.readFile(orderedPath, "utf-8"));
+    }
+
+    const sentPath = path.join(courierDir, "sent.json");
+    if (await exists(sentPath)) {
+      statusRules.sent = JSON.parse(await fs.readFile(sentPath, "utf-8"));
+    }
+
     const trackingPath = path.join(courierDir, "tracking.json");
     let tracking: any = undefined;
     if (await exists(trackingPath)) {

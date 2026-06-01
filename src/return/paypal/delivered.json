@@ -1,0 +1,16 @@
+{
+  "email": [
+    "exact-nocase:service@paypal.com",
+    "exact-nocase:service@paypal.co.uk",
+    "exact-nocase:service@paypal.de",
+    "exact-nocase:service@paypal.pl",
+    "exact-nocase:service@paypal.it"
+  ],
+  "subject": [
+    "nocase:Refund from",
+    "nocase:Zwrot pieniędzy od",
+    "nocase:Rückzahlung von",
+    "nocase:Zwrot od",
+    "nocase:Remboursement de"
+  ]
+}

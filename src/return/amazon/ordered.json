@@ -1,0 +1,17 @@
+{
+  "email": [
+    "exact-nocase:order-update@amazon.com",
+    "exact-nocase:order-update@amazon.ca",
+    "exact-nocase:order-update@amazon.co.uk",
+    "exact-nocase:order-update@amazon.in",
+    "exact-nocase:order-update@amazon.de",
+    "exact-nocase:order-update@amazon.it",
+    "exact-nocase:order-update@amazon.com.au",
+    "exact-nocase:order-update@amazon.pl"
+  ],
+  "subject": [
+    "nocase:Return label for order",
+    "nocase:Your return is ready",
+    "nocase:Zwrot przedmiotu z zamówienia"
+  ]
+}

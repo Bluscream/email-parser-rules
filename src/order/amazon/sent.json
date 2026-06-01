@@ -1,0 +1,18 @@
+{
+  "email": [
+    "exact-nocase:shipment-tracking@amazon.com",
+    "exact-nocase:shipment-tracking@amazon.ca",
+    "exact-nocase:shipment-tracking@amazon.co.uk",
+    "exact-nocase:shipment-tracking@amazon.in",
+    "exact-nocase:shipment-tracking@amazon.de",
+    "exact-nocase:shipment-tracking@amazon.it",
+    "exact-nocase:shipment-tracking@amazon.com.au",
+    "exact-nocase:shipment-tracking@amazon.pl"
+  ],
+  "subject": [
+    "nocase:has shipped",
+    "nocase:versandt",
+    "nocase:spedita",
+    "nocase:wysłana"
+  ]
+}
