@@ -1,0 +1,8 @@
+{
+  "email": [
+    "regex:^KurierDPD\\d+@dpd\\.com\\.pl$",
+    "exact:powiadomienia@allegromail.pl"
+  ],
+  "subject": ["Bezpieczne doręczenie", "przesyłka została nadana"],
+  "body": ["Dziś doręczamy", "DPD Polska"]
+}

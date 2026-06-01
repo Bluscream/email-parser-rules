@@ -1,0 +1,11 @@
+{
+  "email": [
+    "exact:powiadomienia@inpost.pl",
+    "exact:info@paczkomaty.pl",
+    "exact:powiadomienia@allegromail.pl"
+  ],
+  "subject": [
+    "nocase:Kurier InPost: Twoja paczka jest w drodze",
+    "nocase:prawie u Ciebie"
+  ]
+}

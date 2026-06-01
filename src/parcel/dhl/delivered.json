@@ -1,7 +1,7 @@
 {
   "email": [
     "exact:donotreply_odd@dhl.com",
-    "exact:NoReply.ODD@dhl.com",
+    "exact-nocase:NoReply.ODD@dhl.com",
     "exact:noreply@dhl.de",
     "exact:pl.no.reply@dhl.com"
   ],

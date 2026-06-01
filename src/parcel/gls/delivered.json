@@ -1,0 +1,8 @@
+{
+  "email": [
+    "exact:noreply@gls-group.eu",
+    "exact:powiadomienia@allegromail.pl"
+  ],
+  "subject": ["informacja o dostawie"],
+  "body": ["została dzisiaj dostarczona"]
+}

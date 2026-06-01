@@ -1,0 +1,7 @@
+{
+  "email": ["exact:mcinfo@ups.com"],
+  "subject": [
+    "Your UPS Package was delivered",
+    "Your UPS Packages were delivered"
+  ]
+}

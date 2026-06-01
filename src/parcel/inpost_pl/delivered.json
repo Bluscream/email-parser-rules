@@ -1,0 +1,11 @@
+{
+  "email": [
+    "exact:powiadomienia@inpost.pl",
+    "exact:info@paczkomaty.pl",
+    "exact:powiadomienia@allegromail.pl"
+  ],
+  "subject": [
+    "InPost - Potwierdzenie odbioru",
+    "InPost - Paczka umieszczona w Paczkomacie"
+  ]
+}

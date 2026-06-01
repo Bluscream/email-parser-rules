@@ -1,0 +1,5 @@
+{
+  "patterns": [
+    "regex:\\b(?<trackingNumber>\\d{11})\\b"
+  ]
+}

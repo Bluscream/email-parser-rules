@@ -1,0 +1,4 @@
+{
+  "email": ["exact:noreply@notifications.auspost.com.au"],
+  "subject": ["Your shipment has been delivered"]
+}

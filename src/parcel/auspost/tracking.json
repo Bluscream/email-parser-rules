@@ -1,0 +1,5 @@
+{
+  "patterns": [
+    "regex:\\b(?<trackingNumber>\\d{7,12}|[A-Za-z]{2}[0-9]{9}AU)\\b"
+  ]
+}

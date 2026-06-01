@@ -1,0 +1,10 @@
+{
+  "email": [
+    "exact:TrackingUpdates@fedex.com",
+    "exact:fedexcanada@fedex.com"
+  ],
+  "subject": [
+    "Your package has been delivered",
+    "Your packages have been delivered"
+  ]
+}

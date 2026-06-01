@@ -82,8 +82,8 @@ async function buildCategory(category: string) {
 
       // Inject parse callback into the exported rule object
       const objectWithParser = ruleObjStr.replace(
-        /}$/,
-        `  parse: ${importName}\n}`
+        /\n}$/,
+        `,\n  parse: ${importName}\n}`
       );
       ruleDeclarations.push(objectWithParser);
     } else {

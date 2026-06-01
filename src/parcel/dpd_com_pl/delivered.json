@@ -1,0 +1,7 @@
+{
+  "email": [
+    "regex:^KurierDPD\\d+@dpd\\.com\\.pl$",
+    "exact:powiadomienia@allegromail.pl"
+  ],
+  "subject": ["została doręczona"]
+}
