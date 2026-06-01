@@ -1,6 +1,6 @@
 {
   "name": "email-parser-rules",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Modular email parsing rules compiled and minified.",
   "main": "dist/parcel.js",
   "scripts": {
