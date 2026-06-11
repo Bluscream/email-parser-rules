@@ -5,12 +5,12 @@ export const rule: ParcelRule = {
   name: "Hermes",
   description: "Parses Evri / Hermes parcel tracking updates and delivery notifications.",
   icon_url: "https://www.google.com/s2/favicons?domain=evri.com&sz=128",
-  domains: ["myhermes.co.uk"],
+  domains: ["myhermes.co.uk", "myhermes.de"],
   patterns: {
-    emails: "^donotreply@myhermes\\.co\\.uk$",
+    emails: "^donotreply@myhermes\\.co\\.uk$|^noreply@paketankuendigung\\.myhermes\\.de$",
     deliveredSubjects: "Hermes has successfully delivered your",
-    arrivingSubjects: "parcel is now with your local Hermes courier",
-    trackingNumbers: "\\b(?<trackingNumber>\\d{16})\\b"
+    arrivingSubjects: "parcel is now with your local Hermes courier|ist auf dem Weg",
+    trackingNumbers: "\\b(?<trackingNumber>(?:H\\d{13,19}|\\d{14,20}))\\b"
   },
   parse(email: EmailData, helpers: ParserHelpers, meta: RuleMetadata): ParcelParseResult | null {
     if (!helpers.testRegex(email.from, meta.patterns.emails)) return null;

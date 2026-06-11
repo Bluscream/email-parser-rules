@@ -12,7 +12,7 @@ export const rule: ParcelRule = {
     deliveredBodies: "has been delivered|została doręczona|zugestellt",
     arrivingSubjects: "DHL On Demand Delivery|paket kommt heute|Powiadomienie o przesyłce",
     arrivingBodies: "scheduled for delivery TODAY|zostanie dziś do Państwa doręczona",
-    trackingNumbers: "\\b(?<trackingNumber>\\d{10,11})\\b",
+    trackingNumbers: "\\b(?<trackingNumber>\\d{10,20})\\b",
     trackingUrl: "https?:\\/\\/(?:www\\.)?dhl\\.(?:de|com)\\/[^\\s\"'<]+",
     weight: "\\b(?<weight>\\d+(?:[.,]\\d+)?)\\s*(?:kg|g|kilogram)\\b"
   },
